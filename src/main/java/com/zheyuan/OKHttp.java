@@ -1,3 +1,5 @@
+package com.zheyuan;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,10 +22,11 @@ class LivyClient {
     private static String statement = host + "/sessions/5/statements";
     private static String sessions = host + "/sessions";
     private static OkHttpClient client = new OkHttpClient().newBuilder().build();
-    private static Set<Integer> sessionIds = null;
+    public static Set<Integer> sessionIds = null;
 
-    LivyClient() throws IOException {
-        if (LivyClient.getSessionIds().isEmpty()) {
+    LivyClient(String host) throws IOException {
+        this.host = host;
+        if (sessionIds == null || sessionIds.isEmpty()) {
             createSession();
         }
     }
@@ -40,15 +43,12 @@ class LivyClient {
         return new String(Files.readAllBytes(file.toPath()));
     }
 
-    private static Set<Integer> getSessionIds() throws IOException {
+     static Response getSessionIds() throws IOException {
         if (sessionIds == null || sessionIds.isEmpty()) {
             sessionIds = new HashSet<Integer>();
         } else {
             sessionIds.clear();
         }
-
-        OkHttpClient client = new OkHttpClient().newBuilder()
-            .build();
         Request request = new Request.Builder()
             .url(LivyClient.sessions)
             .method("GET", null)
@@ -63,14 +63,11 @@ class LivyClient {
         for (int i = 0; i < arr.length(); i++) {
             int sessionId = arr.getJSONObject(i).getInt("id");
             sessionIds.add(sessionId);
-            System.out.println("found session: " + sessionId);
         }
-        return sessionIds;
+        return response;
     }
 
-    private static Response createSession() throws IOException {
-        OkHttpClient client = new OkHttpClient().newBuilder()
-            .build();
+     static Response createSession() throws IOException {
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create(mediaType, "{\"kind\": \"scala\"}");
         Request request = new Request.Builder()
@@ -83,13 +80,11 @@ class LivyClient {
         return response;
     }
 
-    private static Response deleteSession(int id) throws IOException {
-        if (!getSessionIds().contains(id)) {
+    static Response deleteSession(int id) throws IOException {
+        if (sessionIds == null || !sessionIds.contains(id)) {
             throw new IllegalArgumentException("Session with id: " + id + "does not exists");
         }
 
-        OkHttpClient client = new OkHttpClient().newBuilder()
-            .build();
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
@@ -103,7 +98,7 @@ class LivyClient {
         return response;
     }
 
-    private static Response createStatementWithQuery(String query) throws IOException {
+     static Response createStatementWithQuery(String query) throws IOException {
 
         MediaType mediaType = MediaType.parse("application/json");
         JSONObject obj = new JSONObject();
@@ -120,7 +115,7 @@ class LivyClient {
         return response;
     }
 
-    private static Response createStatementWithFile(Path path) throws IOException {
+     static Response createStatementWithFile(Path path) throws IOException {
 
         MediaType mediaType = MediaType.parse("application/json");
         String bodyContent = LivyClient.parseFile(path.toString());
@@ -138,14 +133,5 @@ class LivyClient {
         // debug
         System.out.println(response.body().string());
         return response;
-    }
-
-    public static void main(String[] args) throws IOException, InterruptedException {
-//        createStatementWithFile(Paths.get("query1.scala"));
-        int i = 2;
-        do {
-            createStatementWithQuery("12 + 3");
-            Thread.sleep(1000L);
-        } while (i-- > 0);
     }
 }
