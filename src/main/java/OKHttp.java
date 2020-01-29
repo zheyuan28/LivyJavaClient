@@ -14,7 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 
-public class OKHttp {
+class LivyClient {
 
     private static String host = "http://den03cyq.us.oracle.com:8998";
     private static String statement = host + "/sessions/5/statements";
@@ -22,14 +22,14 @@ public class OKHttp {
     private static OkHttpClient client = new OkHttpClient().newBuilder().build();
     private static Set<Integer> sessionIds = null;
 
-    OKHttp() throws IOException {
-        if (OKHttp.getSessionIds().isEmpty()) {
+    LivyClient() throws IOException {
+        if (LivyClient.getSessionIds().isEmpty()) {
             createSession();
         }
     }
 
     private static String parseFile(String path) throws IOException {
-        ClassLoader classLoader = OKHttp.class.getClassLoader();
+        ClassLoader classLoader = LivyClient.class.getClassLoader();
 
         File file = new File(Objects.requireNonNull(classLoader.getResource(path)).getFile());
 
@@ -50,12 +50,13 @@ public class OKHttp {
         OkHttpClient client = new OkHttpClient().newBuilder()
             .build();
         Request request = new Request.Builder()
-            .url(OKHttp.sessions)
+            .url(LivyClient.sessions)
             .method("GET", null)
             .addHeader("Content-Type", "application/json")
             .build();
         Response response = client.newCall(request).execute();
 
+        assert response.body() != null;
         JSONObject jsonObject = new JSONObject(response.body().string());
         JSONArray arr = jsonObject.getJSONArray("sessions");
 
@@ -73,11 +74,31 @@ public class OKHttp {
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create(mediaType, "{\"kind\": \"scala\"}");
         Request request = new Request.Builder()
-            .url(OKHttp.sessions)
+            .url(LivyClient.sessions)
             .method("POST", body)
             .addHeader("Content-Type", "application/json")
             .build();
         Response response = client.newCall(request).execute();
+        System.out.println(response.body().string());
+        return response;
+    }
+
+    private static Response deleteSession(int id) throws IOException {
+        if (!getSessionIds().contains(id)) {
+            throw new IllegalArgumentException("Session with id: " + id + "does not exists");
+        }
+
+        OkHttpClient client = new OkHttpClient().newBuilder()
+            .build();
+        MediaType mediaType = MediaType.parse("application/json");
+        RequestBody body = RequestBody.create(mediaType, "");
+        Request request = new Request.Builder()
+            .url(LivyClient.sessions + "/" + id)
+            .method("DELETE", body)
+            .addHeader("Content-Type", "application/json")
+            .build();
+        Response response = client.newCall(request).execute();
+        assert response.body() != null;
         System.out.println(response.body().string());
         return response;
     }
@@ -89,11 +110,12 @@ public class OKHttp {
         obj.put("code", query);
         RequestBody body = RequestBody.create(mediaType, obj.toString());
         Request request = new Request.Builder()
-            .url(OKHttp.statement)
+            .url(LivyClient.statement)
             .method("POST", body)
             .addHeader("Content-Type", "application/json")
             .build();
         Response response = client.newCall(request).execute();
+        assert response.body() != null;
         System.out.println(response.body().string());
         return response;
     }
@@ -101,13 +123,13 @@ public class OKHttp {
     private static Response createStatementWithFile(Path path) throws IOException {
 
         MediaType mediaType = MediaType.parse("application/json");
-        String bodyContent = OKHttp.parseFile(path.toString());
+        String bodyContent = LivyClient.parseFile(path.toString());
         JSONObject obj = new JSONObject();
         obj.put("code", bodyContent);
 
         RequestBody body = RequestBody.create(mediaType, obj.toString());
         Request request = new Request.Builder()
-            .url(OKHttp.statement)
+            .url(LivyClient.statement)
             .method("POST", body)
             .addHeader("Content-Type", "application/json")
             .build();
