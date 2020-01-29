@@ -41,7 +41,8 @@ public class LivyClientTest {
     @Test
     @Ignore
     public void testDeleteSessions() throws IOException {
-        Response r = client.deleteSession(1);
+        Set<Integer> sessionIds = LivyClient.sessionIds;
+        Response r = client.deleteSession(sessionIds.iterator().next());
         assert (r.isSuccessful());
     }
 
