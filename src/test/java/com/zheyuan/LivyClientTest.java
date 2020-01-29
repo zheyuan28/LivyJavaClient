@@ -8,6 +8,11 @@ import okhttp3.Response;
 import org.junit.Ignore;
 import org.junit.Test;
 
+/**
+ * Please create a local Livy Session for Unit testing.
+ * For more information, please read:
+ * https://livy.incubator.apache.org/
+ */
 public class LivyClientTest {
     public LivyClientTest() throws IOException {
     }
@@ -16,7 +21,7 @@ public class LivyClientTest {
     LivyClient client = new LivyClient(host);
 
     @Test
-    @Ignore
+//    @Ignore
     public void testGetSessions() throws IOException {
         Response r = client.getSessionIds();
         Set<Integer> sessionIds = LivyClient.sessionIds;
@@ -27,21 +32,21 @@ public class LivyClientTest {
     }
 
     @Test
-    @Ignore
+//    @Ignore
     public void testCreateSession() throws IOException {
         Response r = client.createSession();
         assert (r.isSuccessful());
     }
 
     @Test
-    @Ignore
+//    @Ignore
     public void testDeleteSessions() throws IOException {
-        Response r = client.deleteSession(7);
+        Response r = client.deleteSession(1);
         assert (r.isSuccessful());
     }
 
     @Test
-    @Ignore
+//    @Ignore
     public void testCreateStatementWithQuery() throws IOException {
         final String query = "spark.range(1, 20).show(false)";
         Response r = client.createStatementWithQuery(query);

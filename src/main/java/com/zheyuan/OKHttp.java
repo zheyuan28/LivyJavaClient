@@ -19,7 +19,7 @@ import org.json.JSONObject;
 class LivyClient {
 
     private static String host = "http://den03cyq.us.oracle.com:8998";
-    private static String statement = host + "/sessions/5/statements";
+    private static String statement = host + "/sessions/1/statements";
     private static String sessions = host + "/sessions";
     private static OkHttpClient client = new OkHttpClient().newBuilder().build();
     public static Set<Integer> sessionIds = null;
@@ -27,8 +27,9 @@ class LivyClient {
     LivyClient(String host) throws IOException {
         this.host = host;
         if (sessionIds == null || sessionIds.isEmpty()) {
-            createSession();
+            assert (createSession().isSuccessful());
         }
+        this.statement = sessions + "/" + sessionIds.iterator().next() + "/statements";
     }
 
     private static String parseFile(String path) throws IOException {
@@ -43,7 +44,7 @@ class LivyClient {
         return new String(Files.readAllBytes(file.toPath()));
     }
 
-     static Response getSessionIds() throws IOException {
+    static Response getSessionIds() throws IOException {
         if (sessionIds == null || sessionIds.isEmpty()) {
             sessionIds = new HashSet<Integer>();
         } else {
@@ -67,7 +68,7 @@ class LivyClient {
         return response;
     }
 
-     static Response createSession() throws IOException {
+    static Response createSession() throws IOException {
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create(mediaType, "{\"kind\": \"scala\"}");
         Request request = new Request.Builder()
@@ -77,6 +78,7 @@ class LivyClient {
             .build();
         Response response = client.newCall(request).execute();
         System.out.println(response.body().string());
+        assert (getSessionIds().isSuccessful());
         return response;
     }
 
@@ -98,7 +100,7 @@ class LivyClient {
         return response;
     }
 
-     static Response createStatementWithQuery(String query) throws IOException {
+    static Response createStatementWithQuery(String query) throws IOException {
 
         MediaType mediaType = MediaType.parse("application/json");
         JSONObject obj = new JSONObject();
@@ -115,7 +117,7 @@ class LivyClient {
         return response;
     }
 
-     static Response createStatementWithFile(Path path) throws IOException {
+    static Response createStatementWithFile(Path path) throws IOException {
 
         MediaType mediaType = MediaType.parse("application/json");
         String bodyContent = LivyClient.parseFile(path.toString());
