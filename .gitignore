@@ -1,7 +1,4 @@
 .idea/*
-.classpath
 .project
 .settings/*
 target/*
-*.iml
-JavaClient.iml
