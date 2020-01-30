@@ -96,6 +96,7 @@ class LivyClient {
             .build();
         Response response = client.newCall(request).execute();
         assert response.body() != null;
+        assert getSessionIds().isSuccessful();
         System.out.println(response.body().string());
         return response;
     }

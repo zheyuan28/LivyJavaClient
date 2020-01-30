@@ -78,8 +78,8 @@ public class LivyClientTest {
     public void testStressTest2() throws IOException, InterruptedException {
         final String query =
             "spark.conf.set(\"spark.sql.crossJoin.enabled\", \"true\");" +
-            "spark.range(1, 20).join(spark.range(10,30)).show(false)";
-        int i = 10;
+            "spark.range(1, 40).join(spark.range(1,30)).show(false)";
+        int i = 100;
         do {
             client.createStatementWithQuery(query);
             Thread.sleep(1000L);
