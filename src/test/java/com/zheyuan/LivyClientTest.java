@@ -17,11 +17,11 @@ public class LivyClientTest {
     public LivyClientTest() throws IOException {
     }
 
-    private final String host = "http://den03cyq.us.oracle.com:8998";
+    private final String host = "http://slc09xqm.us.oracle.com:8998";
     LivyClient client = new LivyClient(host);
 
     @Test
-    @Ignore
+//    @Ignore
     public void testGetSessions() throws IOException {
         Response r = client.getSessionIds();
         Set<Integer> sessionIds = LivyClient.sessionIds;
@@ -42,7 +42,8 @@ public class LivyClientTest {
     @Ignore
     public void testDeleteSessions() throws IOException {
         Set<Integer> sessionIds = LivyClient.sessionIds;
-        Response r = client.deleteSession(sessionIds.iterator().next());
+        Response r = client.deleteSession(6);
+//        Response r = client.deleteSession(sessionIds.iterator().next());
         assert (r.isSuccessful());
     }
 
@@ -63,10 +64,10 @@ public class LivyClientTest {
     }
 
     @Test
-    @Ignore
+//    @Ignore
     public void testStressTest1() throws IOException, InterruptedException {
         final Path p = Paths.get("query1.scala");
-        int i = 5;
+        int i = 20;
         do {
             client.createStatementWithFile(p);
             Thread.sleep(1000L);
@@ -74,12 +75,12 @@ public class LivyClientTest {
     }
 
     @Test
-//    @Ignore
+    @Ignore
     public void testStressTest2() throws IOException, InterruptedException {
         final String query =
             "spark.conf.set(\"spark.sql.crossJoin.enabled\", \"true\");" +
             "spark.range(1, 40).join(spark.range(1,30)).show(false)";
-        int i = 100;
+        int i = 20;
         do {
             client.createStatementWithQuery(query);
             Thread.sleep(1000L);

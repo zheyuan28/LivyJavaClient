@@ -18,7 +18,8 @@ import org.json.JSONObject;
 
 class LivyClient {
 
-    private static String host = "http://den03cyq.us.oracle.com:8998";
+    //    private static String host = "http://den03cyq.us.oracle.com:8998";
+    private static String host = "http://slc09xqm.us.oracle.com:8998";
     private static String statement = host + "/sessions/1/statements";
     private static String sessions = host + "/sessions";
     private static OkHttpClient client = new OkHttpClient().newBuilder().build();
@@ -78,7 +79,7 @@ class LivyClient {
             .build();
         Response response = client.newCall(request).execute();
         System.out.println(response.body().string());
-        assert (getSessionIds().isSuccessful());
+        assert getSessionIds().isSuccessful();
         return response;
     }
 
@@ -103,6 +104,7 @@ class LivyClient {
 
     static Response createStatementWithQuery(String query) throws IOException {
 
+        assert getSessionIds().isSuccessful();
         MediaType mediaType = MediaType.parse("application/json");
         JSONObject obj = new JSONObject();
         obj.put("code", query);
@@ -120,6 +122,7 @@ class LivyClient {
 
     static Response createStatementWithFile(Path path) throws IOException {
 
+        assert getSessionIds().isSuccessful();
         MediaType mediaType = MediaType.parse("application/json");
         String bodyContent = LivyClient.parseFile(path.toString());
         JSONObject obj = new JSONObject();
