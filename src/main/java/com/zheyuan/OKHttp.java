@@ -46,7 +46,7 @@ class LivyClient {
     }
 
     static Response getSessionIds() throws IOException {
-        if (sessionIds == null || sessionIds.isEmpty()) {
+        if (sessionIds == null) {
             sessionIds = new HashSet<Integer>();
         } else {
             sessionIds.clear();
@@ -78,7 +78,6 @@ class LivyClient {
             .addHeader("Content-Type", "application/json")
             .build();
         Response response = client.newCall(request).execute();
-        System.out.println(response.body().string());
         assert getSessionIds().isSuccessful();
         return response;
     }
@@ -98,7 +97,6 @@ class LivyClient {
         Response response = client.newCall(request).execute();
         assert response.body() != null;
         assert getSessionIds().isSuccessful();
-        System.out.println(response.body().string());
         return response;
     }
 
@@ -136,8 +134,6 @@ class LivyClient {
             .build();
         Response response = client.newCall(request).execute();
         assert response.body() != null;
-        // debug
-        System.out.println(response.body().string());
         return response;
     }
 }
